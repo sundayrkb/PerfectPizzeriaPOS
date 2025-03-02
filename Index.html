@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Pizzeria POS</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 10px; 
+            padding: 0; 
+            font-size: 16px;
+        }
+        .section { 
+            margin-bottom: 20px; 
+            padding: 10px; 
+        }
+        h1, h2, h3 { 
+            margin: 10px 0; 
+        }
+        input, select { 
+            width: 100%; 
+            max-width: 300px; 
+            padding: 10px; 
+            margin: 5px 0; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            padding: 12px 20px; 
+            margin: 5px 0; 
+            font-size: 16px; 
+            width: 100%; 
+            max-width: 150px; 
+            cursor: pointer; 
+        }
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            max-width: 100%; 
+            overflow-x: auto; 
+            display: block;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: left; 
+            font-size: 14px; 
+        }
+        th { 
+            background-color: #f2f2f2; 
+        }
+        @media (max-width: 600px) {
+            body { font-size: 14px; }
+            input, select, button { font-size: 14px; padding: 8px; }
+            button { max-width: 120px; }
+            th, td { font-size: 12px; padding: 6px; }
+            .section { padding: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Perfect Pizzeria & Fried Chicken POS</h1>
+
+    <!-- Login -->
+    <div class="section">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <!-- POS Handler View -->
+    <div class="section" id="posView" style="display:none;">
+        <h2>POS Dashboard</h2>
+        <select id="menu"></select>
+        <input type="number" id="quantity" placeholder="Quantity" min="1">
+        <button onclick="processSale()">Process Sale</button>
+        <h3>Stock Availability</h3>
+        <table id="stockTable">
+            <tr><th>Item</th><th>Stock</th></tr>
+        </table>
+    </div>
+
+    <!-- Admin View -->
+    <div class="section" id="adminView" style="display:none;">
+        <h2>Admin Dashboard</h2>
+        <h3>Add POS Handler</h3>
+        <input type="text" id="newUsername" placeholder="New Username">
+        <input type="text" id="newPassword" placeholder="New Password">
+        <button onclick="addUser()">Add Handler</button>
+        <h3>Stats</h3>
+        <table id="statsTable">
+            <tr><th>Date</th><th>Total Sales (₹)</th><th>Top Item</th><th>Units Sold</th></tr>
+        </table>
+    </div>
+
+    <script>
+        const apiUrl = "https://script.google.com/macros/s/AKfycbzQiGsetjYeuNA_FFKjG1CwlsjsoDrmdpyLlw4XTx4KnRpKK3DELTuU5DlCJ8gsLvPl/exec"; // Replace with your URL from Step 2
+        let currentUser = null;
+
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            fetch(`${apiUrl}?action=getStock&username=${username}&password=${password}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (typeof data === "string") alert(data);
+                    else {
+                        currentUser = { username, password };
+                        if (username === "admin") {
+                            document.getElementById("adminView").style.display = "block";
+                            loadStats();
+                        } else {
+                            document.getElementById("posView").style.display = "block";
+                            loadStock(data);
+                            loadMenu();
+                        }
+                    }
+                });
+        }
+
+        function loadStock(stock) {
+            const table = document.getElementById("stockTable");
+            table.innerHTML = "<tr><th>Item</th><th>Stock</th></tr>";
+            stock.slice(1).forEach(row => {
+                table.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`;
+            });
+        }
+
+        function loadMenu() {
+            fetch(`${apiUrl}?action=getMenu&username=${currentUser.username}&password=${currentUser.password}`)
+                .then(response => response.json())
+                .then(data => {
+                    const menu = document.getElementById("menu");
+                    menu.innerHTML = "";
+                    data.slice(1).forEach(row => {
+                        menu.innerHTML += `<option value="${row[0]}|${row[1]}">${row[0]} - ₹${row[1]}</option>`;
+                    });
+                });
+        }
+
+        function processSale() {
+            const [item, price] = document.getElementById("menu").value.split("|");
+            const quantity = parseInt(document.getElementById("quantity").value);
+            const total = price * quantity;
+
+            fetch(apiUrl, {
+                method: "POST",
+                body: JSON.stringify({
+                    username: currentUser.username,
+                    password: currentUser.password,
+                    action: "processSale",
+                    order: { item, quantity, total }
+                })
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    fetch(`${apiUrl}?action=getStock&username=${currentUser.username}&password=${currentUser.password}`)
+                        .then(res => res.json())
+                        .then(loadStock);
+                });
+        }
+
+        function loadStats() {
+            fetch(`${apiUrl}?action=getStats&username=${currentUser.username}&password=${currentUser.password}`)
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById("statsTable");
+                    table.innerHTML = "<tr><th>Date</th><th>Total Sales (₹)</th><th>Top Item</th><th>Units Sold</th></tr>";
+                    data.slice(1).forEach(row => {
+                        table.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
+                    });
+                });
+        }
+
+        function addUser() {
+            const newUsername = document.getElementById("newUsername").value;
+            const newPassword = document.getElementById("newPassword").value;
+
+            fetch(apiUrl, {
+                method: "POST",
+                body: JSON.stringify({
+                    username: currentUser.username,
+                    password: currentUser.password,
+                    action: "addUser",
+                    newUsername: newUsername,
+                    newPassword: newPassword
+                })
+            })
+                .then(response => response.text())
+                .then(data => alert(data));
+        }
+    </script>
+</body>
+</html>
