@@ -1,2 +1,0 @@
-# PerfectPizzeriaPOS
-Perfect Pizzeria POS
