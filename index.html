@@ -1,124 +1,182 @@
 <!DOCTYPE html>
-// check on 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfect Pizzeria POS</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 10px; 
-            padding: 0; 
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
             font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
         }
-        .section { 
-            margin-bottom: 20px; 
-            padding: 10px; 
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-        h1, h2, h3 { 
-            margin: 10px 0; 
+        .section {
+            margin-bottom: 20px;
         }
-        input, select { 
-            width: 100%; 
-            max-width: 300px; 
-            padding: 10px; 
-            margin: 5px 0; 
-            font-size: 16px; 
-            box-sizing: border-box; 
+        h1, h2, h3 {
+            margin: 10px 0;
+            color: #333;
         }
-        button { 
-            padding: 12px 20px; 
-            margin: 5px 0; 
-            font-size: 16px; 
-            width: 100%; 
-            max-width: 150px; 
-            cursor: pointer; 
-        }
-        table { 
-            border-collapse: collapse; 
-            width: 100%; 
-            max-width: 100%; 
-            overflow-x: auto; 
+        input, select {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            margin: 5px auto;
+            font-size: 16px;
+            box-sizing: border-box;
             display: block;
         }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 8px; 
-            text-align: left; 
-            font-size: 14px; 
+        button {
+            padding: 12px 20px;
+            margin: 5px auto;
+            font-size: 16px;
+            width: 100%;
+            max-width: 150px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
         }
-        th { 
-            background-color: #f2f2f2; 
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 100%;
+            margin: 10px auto;
+            overflow-x: auto;
+            display: block;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #error {
+            color: red;
+            margin: 10px 0;
+            display: none;
         }
         @media (max-width: 600px) {
-            body { font-size: 14px; }
+            body { font-size: 14px; padding: 10px; }
+            .container { padding: 15px; }
             input, select, button { font-size: 14px; padding: 8px; }
             button { max-width: 120px; }
             th, td { font-size: 12px; padding: 6px; }
-            .section { padding: 5px; }
         }
     </style>
 </head>
 <body>
-    <h1>Perfect Pizzeria & Fried Chicken POS</h1>
+    <div class="container">
+        <h1>Perfect Pizzeria & Fried Chicken POS</h1>
 
-    <!-- Login -->
-    <div class="section">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-    </div>
+        <!-- Login -->
+        <div class="section" id="loginView">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <div id="error"></div>
+        </div>
 
-    <!-- POS Handler View -->
-    <div class="section" id="posView" style="display:none;">
-        <h2>POS Dashboard</h2>
-        <select id="menu"></select>
-        <input type="number" id="quantity" placeholder="Quantity" min="1">
-        <button onclick="processSale()">Process Sale</button>
-        <h3>Stock Availability</h3>
-        <table id="stockTable">
-            <tr><th>Item</th><th>Stock</th></tr>
-        </table>
-    </div>
+        <!-- POS Handler View -->
+        <div class="section" id="posView" style="display:none;">
+            <h2>POS Dashboard</h2>
+            <select id="menu"></select>
+            <input type="number" id="quantity" placeholder="Quantity" min="1">
+            <button onclick="processSale()">Process Sale</button>
+            <h3>Stock Availability</h3>
+            <table id="stockTable">
+                <tr><th>Item</th><th>Stock</th></tr>
+            </table>
+            <h3>Daily Stats</h3>
+            <table id="handlerStatsTable">
+                <tr><th>Date</th><th>Total Sales (₹)</th><th>Top Item</th><th>Units Sold</th></tr>
+            </table>
+        </div>
 
-    <!-- Admin View -->
-    <div class="section" id="adminView" style="display:none;">
-        <h2>Admin Dashboard</h2>
-        <h3>Add POS Handler</h3>
-        <input type="text" id="newUsername" placeholder="New Username">
-        <input type="text" id="newPassword" placeholder="New Password">
-        <button onclick="addUser()">Add Handler</button>
-        <h3>Stats</h3>
-        <table id="statsTable">
-            <tr><th>Date</th><th>Total Sales (₹)</th><th>Top Item</th><th>Units Sold</th></tr>
-        </table>
+        <!-- Admin View -->
+        <div class="section" id="adminView" style="display:none;">
+            <h2>Admin Dashboard</h2>
+            <div id="adminOnly" style="display:none;">
+                <h3>Add POS Handler</h3>
+                <input type="text" id="newUsername" placeholder="New Username">
+                <input type="text" id="newPassword" placeholder="New Password">
+                <button onclick="addUser()">Add Handler</button>
+            </div>
+            <h3>Daily Stats</h3>
+            <table id="adminStatsTable">
+                <tr><th>Date</th><th>Total Sales (₹)</th><th>Top Item</th><th>Units Sold</th></tr>
+            </table>
+        </div>
     </div>
 
     <script>
-        const apiUrl = "https://script.google.com/macros/s/AKfycbzQiGsetjYeuNA_FFKjG1CwlsjsoDrmdpyLlw4XTx4KnRpKK3DELTuU5DlCJ8gsLvPl/exec"; // Replace with your URL from Step 2
+        const apiUrl = "https://script.google.com/macros/s/AKfycbzQiGsetjYeuNA_FFKjG1CwlsjsoDrmdpyLlw4XTx4KnRpKK3DELTuU5DlCJ8gsLvPl/exec";
         let currentUser = null;
+        let stockData = []; // Store stock data locally for calculations
 
         function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
+            const errorDiv = document.getElementById("error");
 
             fetch(`${apiUrl}?action=getStock&username=${username}&password=${password}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (typeof data === "string") alert(data);
-                    else {
+                    if (typeof data === "string") {
+                        errorDiv.textContent = "Invalid credentials";
+                        errorDiv.style.display = "block";
+                    } else {
+                        errorDiv.style.display = "none";
                         currentUser = { username, password };
-                        if (username === "admin") {
-                            document.getElementById("adminView").style.display = "block";
-                            loadStats();
-                        } else {
-                            document.getElementById("posView").style.display = "block";
-                            loadStock(data);
-                            loadMenu();
-                        }
+
+                        // Fetch user role from Users sheet
+                        fetch(`${apiUrl}?action=getUsers&username=${username}&password=${password}`)
+                            .then(res => res.json())
+                            .then(users => {
+                                const user = users.find(u => u[0] === username && u[1] === password);
+                                currentUser.role = user ? user[2] : "POS Handler"; // Default to handler if no role
+
+                                stockData = data; // Store stock data
+                                document.getElementById("loginView").style.display = "none";
+                                if (currentUser.role === "Admin") {
+                                    document.getElementById("adminView").style.display = "block";
+                                    document.getElementById("adminOnly").style.display = "block";
+                                    loadStats("adminStatsTable");
+                                } else {
+                                    document.getElementById("posView").style.display = "block";
+                                    loadStock(stockData);
+                                    loadMenu();
+                                    loadStats("handlerStatsTable");
+                                }
+                            });
                     }
+                })
+                .catch(() => {
+                    errorDiv.textContent = "Error connecting to server";
+                    errorDiv.style.display = "block";
                 });
         }
 
@@ -137,15 +195,16 @@
                     const menu = document.getElementById("menu");
                     menu.innerHTML = "";
                     data.slice(1).forEach(row => {
-                        menu.innerHTML += `<option value="${row[0]}|${row[1]}">${row[0]} - ₹${row[1]}</option>`;
+                        menu.innerHTML += `<option value="${row[0]}|${row[1]}|${row[2]}">${row[0]} - ₹${row[1]}</option>`;
                     });
                 });
         }
 
         function processSale() {
-            const [item, price] = document.getElementById("menu").value.split("|");
+            const [item, price, ingredientsJson] = document.getElementById("menu").value.split("|");
             const quantity = parseInt(document.getElementById("quantity").value);
             const total = price * quantity;
+            const ingredients = JSON.parse(ingredientsJson);
 
             fetch(apiUrl, {
                 method: "POST",
@@ -158,18 +217,28 @@
             })
                 .then(response => response.text())
                 .then(data => {
-                    alert(data);
-                    fetch(`${apiUrl}?action=getStock&username=${currentUser.username}&password=${currentUser.password}`)
-                        .then(res => res.json())
-                        .then(loadStock);
+                    if (data === "Sale processed") {
+                        // Update stock locally
+                        Object.keys(ingredients).forEach(itemName => {
+                            const stockRow = stockData.find(row => row[0] === itemName);
+                            if (stockRow) {
+                                stockRow[1] -= quantity * ingredients[itemName];
+                            }
+                        });
+                        loadStock(stockData);
+                        loadStats("handlerStatsTable"); // Update stats for handler
+                        alert("Sale processed successfully");
+                    } else {
+                        alert("Error processing sale");
+                    }
                 });
         }
 
-        function loadStats() {
+        function loadStats(tableId) {
             fetch(`${apiUrl}?action=getStats&username=${currentUser.username}&password=${currentUser.password}`)
                 .then(response => response.json())
                 .then(data => {
-                    const table = document.getElementById("statsTable");
+                    const table = document.getElementById(tableId);
                     table.innerHTML = "<tr><th>Date</th><th>Total Sales (₹)</th><th>Top Item</th><th>Units Sold</th></tr>";
                     data.slice(1).forEach(row => {
                         table.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
@@ -192,7 +261,13 @@
                 })
             })
                 .then(response => response.text())
-                .then(data => alert(data));
+                .then(data => {
+                    alert(data);
+                    if (data === "User added successfully") {
+                        document.getElementById("newUsername").value = "";
+                        document.getElementById("newPassword").value = "";
+                    }
+                });
         }
     </script>
 </body>
