@@ -135,7 +135,7 @@
     <script>
         const apiUrl = "https://script.google.com/macros/s/AKfycbzQiGsetjYeuNA_FFKjG1CwlsjsoDrmdpyLlw4XTx4KnRpKK3DELTuU5DlCJ8gsLvPl/exec";
         let currentUser = null;
-        let stockData = []; // Store stock data locally for calculations
+        let stockData = []; // Store stock data locally
 
         function login() {
             const username = document.getElementById("username").value;
@@ -151,27 +151,18 @@
                     } else {
                         errorDiv.style.display = "none";
                         currentUser = { username, password };
-
-                        // Fetch user role from Users sheet
-                        fetch(`${apiUrl}?action=getUsers&username=${username}&password=${password}`)
-                            .then(res => res.json())
-                            .then(users => {
-                                const user = users.find(u => u[0] === username && u[1] === password);
-                                currentUser.role = user ? user[2] : "POS Handler"; // Default to handler if no role
-
-                                stockData = data; // Store stock data
-                                document.getElementById("loginView").style.display = "none";
-                                if (currentUser.role === "Admin") {
-                                    document.getElementById("adminView").style.display = "block";
-                                    document.getElementById("adminOnly").style.display = "block";
-                                    loadStats("adminStatsTable");
-                                } else {
-                                    document.getElementById("posView").style.display = "block";
-                                    loadStock(stockData);
-                                    loadMenu();
-                                    loadStats("handlerStatsTable");
-                                }
-                            });
+                        stockData = data; // Store stock data
+                        document.getElementById("loginView").style.display = "none";
+                        if (username === "admin") {
+                            document.getElementById("adminView").style.display = "block";
+                            document.getElementById("adminOnly").style.display = "block";
+                            loadStats("adminStatsTable");
+                        } else {
+                            document.getElementById("posView").style.display = "block";
+                            loadStock(stockData);
+                            loadMenu();
+                            loadStats("handlerStatsTable");
+                        }
                     }
                 })
                 .catch(() => {
