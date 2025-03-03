@@ -133,9 +133,9 @@
     </div>
 
     <script>
-        const apiUrl = "https://script.google.com/macros/s/AKfycbzQiGsetjYeuNA_FFKjG1CwlsjsoDrmdpyLlw4XTx4KnRpKK3DELTuU5DlCJ8gsLvPl/exec";
+        const apiUrl = "https://script.google.com/macros/s/AKfycbxrOMBIyI466-4tc310SnIzjRRKUXh4PXp25Dw6ki4mx99SItmIovosfeChzMbN4lRwzA/exec";
         let currentUser = null;
-        let stockData = []; // Store stock data locally
+        let stockData = [];
 
         function login() {
             const username = document.getElementById("username").value;
@@ -151,7 +151,7 @@
                     } else {
                         errorDiv.style.display = "none";
                         currentUser = { username, password };
-                        stockData = data; // Store stock data
+                        stockData = data;
                         document.getElementById("loginView").style.display = "none";
                         if (username === "admin") {
                             document.getElementById("adminView").style.display = "block";
@@ -209,7 +209,6 @@
                 .then(response => response.text())
                 .then(data => {
                     if (data === "Sale processed") {
-                        // Update stock locally
                         Object.keys(ingredients).forEach(itemName => {
                             const stockRow = stockData.find(row => row[0] === itemName);
                             if (stockRow) {
@@ -217,7 +216,7 @@
                             }
                         });
                         loadStock(stockData);
-                        loadStats("handlerStatsTable"); // Update stats for handler
+                        loadStats("handlerStatsTable");
                         alert("Sale processed successfully");
                     } else {
                         alert("Error processing sale");
@@ -231,9 +230,18 @@
                 .then(data => {
                     const table = document.getElementById(tableId);
                     table.innerHTML = "<tr><th>Date</th><th>Total Sales (₹)</th><th>Top Item</th><th>Units Sold</th></tr>";
-                    data.slice(1).forEach(row => {
-                        table.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
-                    });
+                    if (data && data.length > 1) { // Check if data exists beyond header
+                        data.slice(1).forEach(row => {
+                            table.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
+                        });
+                    } else {
+                        table.innerHTML += `<tr><td colspan="4">No sales data available</td></tr>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching stats:", error);
+                    const table = document.getElementById(tableId);
+                    table.innerHTML += `<tr><td colspan="4">Error loading stats</td></tr>`;
                 });
         }
 
