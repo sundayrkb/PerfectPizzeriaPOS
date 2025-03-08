@@ -115,14 +115,10 @@
     </style>
 </head>
 <body>
-    <!-- Menu Image at the Top -->
     <img src="https://raw.githubusercontent.com/sundayrkb/PerfectPizzeriaPOS/main/menu_image.jpg" alt="Perfect Pizzeria Menu" class="menu-image">
-
-    <!-- Login Button at Top Right -->
     <button class="login-button" onclick="document.getElementById('loginView').style.display='block';">Login</button>
 
     <div class="container">
-        <!-- Login -->
         <div class="section" id="loginView" style="display:none;">
             <h2>Login</h2>
             <input type="text" id="username" placeholder="Username">
@@ -131,7 +127,6 @@
             <div id="error"></div>
         </div>
 
-        <!-- POS Handler View -->
         <div class="section" id="posView" style="display:none;">
             <h2>POS Dashboard</h2>
             <select id="menu"></select>
@@ -147,7 +142,6 @@
             </table>
         </div>
 
-        <!-- Admin View -->
         <div class="section" id="adminView" style="display:none;">
             <h2>Admin Dashboard</h2>
             <div id="adminOnly" style="display:none;">
@@ -164,7 +158,7 @@
     </div>
 
     <script>
-        const apiUrl = "https://script.google.com/macros/s/AKfycbwdfMwtqYsuiYfLK4VSbBDHD4ocqMnGC5XGNUmTiT_oJ3l3gRqfDTdUl8zcZyyLEv9g2Q/exec";
+        const apiUrl = "https://script.google.com/macros/s/AKfycby-H3nKpz9Z0CCyHlfLhurvwjCJHJZnjpPWndQMRALTs2mLYLNJgAEJ8KnEE9BhXp7wow/exec";
         let currentUser = null;
         let stockData = [];
 
@@ -177,7 +171,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (typeof data === "string") {
-                        errorDiv.textContent = "Invalid credentials";
+                        errorDiv.textContent = data;
                         errorDiv.style.display = "block";
                     } else {
                         errorDiv.style.display = "none";
@@ -196,7 +190,8 @@
                         }
                     }
                 })
-                .catch(() => {
+                .catch(error => {
+                    console.error("Login error:", error);
                     errorDiv.textContent = "Error connecting to server";
                     errorDiv.style.display = "block";
                 });
@@ -219,7 +214,8 @@
                     data.slice(1).forEach(row => {
                         menu.innerHTML += `<option value="${row[0]}|${row[1]}|${row[2]}">${row[0]} - ₹${row[1]}</option>`;
                     });
-                });
+                })
+                .catch(error => console.error("Error loading menu:", error));
         }
 
         function processSale() {
@@ -252,6 +248,10 @@
                     } else {
                         alert(data || "Error processing sale");
                     }
+                })
+                .catch(error => {
+                    console.error("Error processing sale:", error);
+                    alert("Error processing sale: " + error.message);
                 });
         }
 
@@ -297,7 +297,8 @@
                         document.getElementById("newUsername").value = "";
                         document.getElementById("newPassword").value = "";
                     }
-                });
+                })
+                .catch(error => console.error("Error adding user:", error));
         }
     </script>
 </body>
