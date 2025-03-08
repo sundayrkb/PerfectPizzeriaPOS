@@ -8,13 +8,34 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-size: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .menu-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+        .login-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            z-index: 1000;
+        }
+        .login-button:hover {
+            background-color: #45a049;
         }
         .container {
             max-width: 600px;
@@ -24,6 +45,10 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            margin: 0 auto;
+            flex: 1;
+            position: relative;
+            top: -20px; /* Adjust to align with menu image */
         }
         .section {
             margin-bottom: 20px;
@@ -84,15 +109,21 @@
             input, select, button { font-size: 14px; padding: 8px; }
             button { max-width: 120px; }
             th, td { font-size: 12px; padding: 6px; }
+            .menu-image { max-height: 300px; }
+            .login-button { top: 5px; right: 5px; padding: 8px 15px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Perfect Pizzeria & Fried Chicken POS</h1>
+    <!-- Menu Image at the Top -->
+    <img src="https://raw.githubusercontent.com/sundayrkb/PerfectPizzeriaPOS/main/menu_image.jpg" alt="Perfect Pizzeria Menu" class="menu-image">
 
+    <!-- Login Button at Top Right -->
+    <button class="login-button" onclick="document.getElementById('loginView').style.display='block';">Login</button>
+
+    <div class="container">
         <!-- Login -->
-        <div class="section" id="loginView">
+        <div class="section" id="loginView" style="display:none;">
             <h2>Login</h2>
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
@@ -133,7 +164,7 @@
     </div>
 
     <script>
-        const apiUrl = "https://script.google.com/macros/s/AKfycbzUVtKFWmSXleLz3HtubCJNx-hZFD3PmAn_Cb2UZeGlGwtQhQapAbDNk_5gheW3kEw8hQ/exec";
+        const apiUrl = "https://script.google.com/macros/s/AKfycbyIxj6vDTMiEsI4YrgSnn-nKZ5REcDkHmxkK9A164iAFenXdGSvBwbI3uGz3Xwnx1MVEQ/exec";
         let currentUser = null;
         let stockData = [];
 
@@ -219,7 +250,7 @@
                         loadStats("handlerStatsTable");
                         alert("Sale processed successfully");
                     } else {
-                        alert("Error processing sale");
+                        alert(data || "Error processing sale");
                     }
                 });
         }
